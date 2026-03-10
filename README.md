@@ -10,22 +10,42 @@ The dataset files for both the Sham and TAC datasets are on DropBox, and can be 
 > Each dataset contain a large volume of data ~12GB for the Sham, and ~15GB for the TAC dataset. This is because each dataset contains high resolution WGA & DAPI images, tens-of-thousands of cells, and hundreds-of-millions of transcripts. For visualization, these data will be converted to visualization files that will also require approximately the same amount of space as the raw datasets. So please keep this in mind when downloading the data! 
 
 ## Installation
-The following instructions require that you have [Anaconda](https://www.anaconda.com/) installed.
-- In MacOS, run the following commands from the Terminal.
-- In Windows, run the following commands from the Anaconda Prompt.
-- BellaVista requires Python 3.9 or above and is dependent on GPU for rendering. We recommend using Python 3.12.
 
-Create and activate a new virtual environment:
+BellaVista requires Python 3.9 or above and is dependent on GPU for rendering. We recommend using Python 3.12.
+
+### Using uv (recommended)
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) then run:
+
+```
+uv venv -p 3.12 bellavista_env
+# macOS/Linux:
+source bellavista_env/bin/activate
+# Windows:
+bellavista_env\Scripts\activate
+
+uv pip install "bellavista-kolab-merfish @ git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH.git"
+```
+
+For development (editable install):
+
+```
+git clone https://github.com/pkosurilab/BellaVista-KoLab-MERFISH
+cd BellaVista-KoLab-MERFISH
+uv venv -p 3.12
+# macOS/Linux:
+source .venv/bin/activate
+# Windows:
+.venv\Scripts\activate
+
+uv pip install -e .
+```
+
+### Using conda/pip
 
 ```
 conda create -n bellavista_env python=3.12
 conda activate bellavista_env
-```
-
-Install from GitHub repo:
-
-```
-conda install git
 git clone https://github.com/pkosurilab/BellaVista-KoLab-MERFISH
 pip install -e BellaVista-KoLab-MERFISH
 ```
