@@ -1,13 +1,7 @@
 # BellaVista - KoLab-MERFISH edition
 
-This development version is curated for visualization of KoLab-MERFISH datasets from the mouse heart.  
+BellaVista is a visualization tool for interactive exploration of imaging-based transcriptomic data. This development version is designed for data already processed through the KoLab-MERFISH pipeline. BellaVista can be used to visualize the 4 key dataset components of each KoLab-MERFISH dataset: (1) WGA & DAPI images, (2) Cell segmentation boundaries, (3) Transcript locations, (4) Cell network connectivity graphs. Note: BellaVista is purely a visualization tool - it does not perform data processing or analysis :)
 
-## DropBox data information:
-
-The dataset files for both the Sham and TAC datasets are on DropBox, and can be accessed via the private link we shared. There are 2 folders, one for each dataset. Here, you can find the files for each of the 4 key dataset components: (1) WGA & DAPI images (2) Cell boundaries (3) Transcripts (4) Cell network connectivity graphs. After downloading the zipped folder from DropBox, unzip the folder, and open the BellaVista JSON config file.
-
-> [!NOTE]  
-> Each dataset contain a large volume of data ~12GB for the Sham, and ~15GB for the TAC dataset. This is because each dataset contains high resolution WGA & DAPI images, tens-of-thousands of cells, and hundreds-of-millions of transcripts. For visualization, these data will be converted to visualization files that will also require approximately the same amount of space as the raw datasets. So please keep this in mind when downloading the data! 
 
 ## Installation
 
@@ -50,36 +44,30 @@ git clone https://github.com/pkosurilab/BellaVista-KoLab-MERFISH
 pip install -e BellaVista-KoLab-MERFISH
 ```
 
-After installing the BellaVista package, you can visualize each KoLab-MERFISH dataset by providing a JSON config file:
-* The JSON file argument should contain the file path to your JSON file. Replace TAC_bellavista_config.json with the dataset of your choice. The JSON files are located in the DropBox folders.
+# Quick Start (with sample data)
+
+After installing the BellaVista package, launch the demo with a sample FOV from the TAC mouse heart with the following command:
 
 ```
-bellavista /path/to/TAC_bellavista_config.json
+bellavista --demo
 ```
 
 > [!NOTE]
-> It will take a few minutes to create the required data files. The terminal will print updates & have progress bars for time consuming steps.
-
-
-### Configuring the JSON file:
-
-The BellaVista JSON config file for each dataset can be found within the respective data folder. The only line you need to change is the **data_folder** parameter. This should be changed to the absolute path to the folder containing the dataset files. If no valid path is provided, BellaVista will search for input files in the parent folder of the JSON file. See further details below.
+> It will take a few minutes to download and create the required data files. The terminal will print updates & display progress bars for time consuming steps. The downloaded sample data folder is ~17MB.
 
 ## BellaVista GUI:
 
-After successfully loading BellaVista with the command `bellavista /path/to/TAC_bellavista_config.json`, you should see the message Data Loaded! in the terminal.
-
-A napari window should appear displaying the data similar to the image below (TAC dataset shown here):
+After successfully loading the BellaVista, you should see the message Data Loaded! in the terminal. A napari window should appear displaying the sample data similar to the image below (TAC sample FOV dataset shown here):
 
 <p align="middle">
-<img src="https://github.com/pkosurilab/BellaVista-KoLab-MERFISH/blob/main/images/TAC_WGA.png?raw=true" alt="BellaVista TAC dataset zoom out" width="800" />
+<img src="https://github.com/pkosurilab/BellaVista-KoLab-MERFISH/blob/main/images/BellaVista_demo_launch_screen.png?raw=true" alt="BellaVista demo sample TAC dataset initial screen" width="800" />
 </p>
 
 Now, you can interactively move around the napari canvas to explore the data.
 Try zooming in & out, plotting cell-type-specific transcripts, cell boundaries, and cell networks!
 
 <p align="middle">
-<img src="https://github.com/pkosurilab/BellaVista-KoLab-MERFISH/blob/main/images/BellaVista_demo.png?raw=true" alt="BellaVista TAC dataset" width="800" />
+<img src="https://github.com/pkosurilab/BellaVista-KoLab-MERFISH/blob/main/images/BellaVista_sample_demo.png?raw=true" alt="BellaVista demo sample TAC dataset" width="800" />
 </p>
 
 BellaVista uses the napari interface and features a widget located on the right side of the napari window to plot each dataset feature. The widget has five components:
@@ -125,41 +113,100 @@ The "Locations 🦎" widget can be used to save and move to marked camera coordi
 > [!NOTE]  
 > If the input files for a feature was not provided or an error occurred during data processing, the corresponding widget may not be available. A detailed log file `error_log.log` can be found in the `BellaVista_outputs` subfolder inside the data folder. 
 
+> **That's it for the Quick Start!** The section below describes how to visualize the full-scale datasets. 
 
-## Configuration JSON file structure
+# Dropbox data information:
 
-In order to visualize a KoLab-MERFISH dataset in BellaVista, you will need to create a dataset-specific JSON configuration file containing paths to the KoLab-MERFISH outputs for the dataset. These output files will be processed to generate visualization files for BellaVista. Creating these visualization files will take a few minutes but only need to be created once. For subsequent runs, `create_inputs` can be set to `False`.
+The dataset files for the full Sham and TAC datasets are on Dropbox, and can be accessed via the private link we shared. There are 2 folders, one for each dataset. Here, you can find the files for each of the 4 key data components: (1) WGA & DAPI images, (2) Cell boundaries, (3) Transcripts, (4) Cell network connectivity graphs, along with auxiliary files. After downloading from Dropbox, unzip the folder.
 
-JSON params
+> [!IMPORTANT]  
+> Each dataset contains a large volume of data ~12GB for the Sham, and ~15GB for the TAC dataset. This is because each dataset contains high resolution WGA & DAPI images, tens-of-thousands of cells, and hundreds-of-millions of transcripts. For visualization, these data will be converted to visualization files that will also require approximately the same amount of space as the raw datasets. So please keep this in mind when downloading the data! 
+
+To run BellaVista for a full dataset, run the following command:
+
 ```
-"input_files": {
+bellavista /path/to/downloaded/TAC/dataset/folder
+```
+
+> [!NOTE]
+> It will take a few minutes to download and create the required data files. The terminal will print updates & display progress bars for time consuming steps.
+
+After successfully loading BellaVista, you should see the message `Data Loaded!` in the terminal. A napari window should appear displaying the data similar to the image below (TAC dataset shown here):
+
+<p align="middle">
+<img src="https://github.com/pkosurilab/BellaVista-KoLab-MERFISH/blob/main/images/TAC_WGA.png?raw=true" alt="BellaVista TAC dataset zoom out" width="800" />
+</p>
+
+Now, you can interactively move around the napari canvas to explore the data.
+Try zooming in & out, plotting cell-type-specific transcripts, cell boundaries, and cell networks!
+
+<p align="middle">
+<img src="https://github.com/pkosurilab/BellaVista-KoLab-MERFISH/blob/main/images/BellaVista_demo.png?raw=true" alt="BellaVista TAC dataset" width="800" />
+</p>
+
+## KoLab-MERFISH Dataset Configuration
+
+BellaVista uses a JSON config file to specify input files and visualization parameters. We've included a pre-configured one for each dataset in the corresponding Dropbox folder, so no editing needed! 
+
+> The following section covers the config file structure in detail — feel free to skip if you're using the pre-configured files.
+
+### Configuration JSON file structure
+
+To visualize a KoLab-MERFISH dataset, you will need to create a dataset-specific JSON config file that points to your KoLab-MERFISH output files. These output files will be processed to generate visualization files for BellaVista. Creating these visualization files will take a few minutes but only need to be created once. For subsequent runs, `create_inputs` can be set to `False`.
+
+To launch BellaVista, provide the path to your dataset JSON config file:
+
+```
+bellavista /path/to/your/dataset_config.json
+```
+
+#### JSON params
+```
+{ 
+    "system": "KoLabMERFISH",
+    "create_bellavista_inputs": true,
+    "data_folder": "/path/to/dataset/folder"
+
+
+    "visualization_parameters": {
+        "contrast_limits": [0, 60000],
+        "gamma": 2,
+        "transcript_point_size": 1,
+        "rotate_angle": 0 
+    },
+
+
+    "input_files": {
         "images": ["Images/WGA.tif", "Images/DAPI.tif"],
         "microscope_parameters": "microscope_parameters.json",
-
         "transcript_files": [
-                            "Transcripts/all_transcripts.csv.gzs", 
+                            "Transcripts/all_transcripts.csv.gz", 
+                            "Transcripts/CM_scrub_transcripts.csv.gz", 
                             "Transcripts/CM_transcripts.csv.gz", 
                             "Transcripts/EC_transcripts.csv.gz", 
                             "Transcripts/FB_transcripts.csv.gz", 
-                            "Transcripts/IC_transcripts.csv.gz",
-                            "Transcripts/CM_scrub_transcripts.csv.gz"],
+                            "Transcripts/IC_transcripts.csv.gz"],
         
         "segmentation_files": [
                                 "CellBoundaries/all_boundaries.csv.gz",
+                                "CellBoundaries/CM_scrub_boundaries.csv.gz",
                                 "CellBoundaries/CM_boundaries.csv.gz", 
                                 "CellBoundaries/EC_boundaries.csv.gz", 
                                 "CellBoundaries/FB_boundaries.csv.gz",
-                                "CellBoundaries/IC_boundaries.csv.gz",
-                                "CellBoundaries/CM_scrub_boundaries.csv.gz"],
-        "network_file": "network_graph.pkl"
+                                "CellBoundaries/IC_boundaries.csv.gz"],
+        "network_file": "TAC_network_graph.pkl"
     }
+}
+
 ```
 
 ## General parameters
 
 **data_folder**: *string*
 
-* The path to the folder where the KoLab-MERFISH dataset output files are stored. BellaVista visualization files will be saved in a new folder named `BellaVista_outputs` within the data_folder.
+* The path to the folder where the KoLab-MERFISH dataset output files are stored. BellaVista visualization files will be saved in a new folder named `BellaVista_outputs` within the data_folder. 
+
+  > If no valid path is provided, BellaVista will look for the input files in the same parent folder as the JSON configuration file.   
   
 **create_bellavista_inputs**: *boolean, default=true*
 
@@ -173,6 +220,10 @@ JSON params
 **contrast_limits**: *tuple array of integers, default=None*
 
 * Range of values [0, 65535] used to set the contrast limits for the displayed image(s)
+
+**gamma**: *float, default=1*
+
+* Gamma correction value for the displayed image(s)
 
 **transcript_point_size**: *float, default=1*
 
@@ -203,7 +254,7 @@ JSON params
 
 **network_file**: *string*
 
-* relative path to pickle file containing KoLab-MERFISH network data
+* relative path to pickle file containing KoLab-MERFISH network graph data
 
 > [!IMPORTANT]  
 > All input file paths **must** be relative paths to `data_folder`

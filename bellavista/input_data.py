@@ -45,7 +45,7 @@ def create_inputs(json_file: Dict):
     bellavista_output_folder = data_folder / "BellaVista_outputs"
 
     if not bellavista_output_folder.is_dir():
-        print(f'Directory {bellavista_output_folder} does not exist -- creating the directory!')
+        print(f'"BellaVista_outputs" does not exist -- creating the directory!')
         os.makedirs(bellavista_output_folder)
 
     setup_logger(bellavista_output_folder)
@@ -59,7 +59,7 @@ def create_inputs(json_file: Dict):
     # system = json_file.get('system')
     # if (system.lower() == 'kolabmerfish'):
 
-    print('Creating BellaVista input files for KoLab-MERFISH')
+    print('Creating BellaVista input files for KoLab-MERFISH:')
     um_px_transforms = input_data_kolab.create_micron_pixel(*args)
     create_ome_zarr(*args, transforms=um_px_transforms)
     input_data_kolab.create_transcripts(*args)
@@ -88,27 +88,29 @@ def create_ome_zarr(data_folder: Path, json_file_input_files: Dict, transforms: 
         return
 
     try:
-        print('Creating OME-Zarr Images')
+        # print('Creating OME-Zarr Images')
         if isinstance(images, str):
             images = [images]
         
-        # z_plane = json_file_input_files.get('z_plane', 0)
+        z_plane = json_file_input_files.get('z_plane', 0)
         
         # if images have been processed previously, exit early
         ome_zarr_path = bellavista_output_folder / "Images.zarr"
         store = parse_url(ome_zarr_path, mode="a").store
         root = zarr.group(store=store)
+
+        existing_images = list(root.group_keys())
+        file_names = [Path(Path(file).stem).stem.replace("_", " ") for file in images]
+        previously_processed = list(set(existing_images).intersection(set(file_names)))
+        if len(previously_processed) > 0:
+            print(f"{', '.join(previously_processed)} image(s) processed previously. Skipping reprocessing.")
+
         
         for image in images:
             file_name = Path(image).stem
 
-            ome_zarr_dataset = data_folder / image
-
-            if file_name in root:
-                print(f'{file_name} image processed previously. Skipping reprocessing.')
-                continue
-            
-            else:
+            if not file_name in root.group_keys():
+                print(f"Processing {file_name} image...", end="", flush=True)
                 data = imread(data_folder / image)
 
                 if data.ndim == 2:
@@ -121,7 +123,7 @@ def create_ome_zarr(data_folder: Path, json_file_input_files: Dict, transforms: 
                     data = data[z_plane:z_plane+1]
                 
                 else:
-                    print(f"Warning: z_plane {z_plane} out of range for {file_name}. Using first plane.")
+                    print(f" Warning: z_plane {z_plane} out of range for {file_name}. Using first plane.")
                     data = data[0:1]
 
                 transforms["px_val_min"] = data.min().compute()
@@ -136,7 +138,7 @@ def create_ome_zarr(data_folder: Path, json_file_input_files: Dict, transforms: 
                     chunks=(1,1024, 1024),
                     metadata=transforms
                 )
-                print(f'{file_name} OME-Zarr image saved successfully!')
+                print(f' {file_name} OME-Zarr image saved successfully!')
             
     except Exception as e:
         print(f'An error occurred during create_ome_zarr.')
