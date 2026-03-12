@@ -5,7 +5,7 @@ BellaVista is a visualization tool for interactive exploration of imaging-based 
 
 ## Installation
 
-BellaVista requires Python 3.9 or above and is dependent on GPU for rendering. We recommend using Python 3.12.
+BellaVista requires Python 3.10 or above and is dependent on GPU for rendering. We recommend using Python 3.12.
 
 ### Using uv (recommended)
 
