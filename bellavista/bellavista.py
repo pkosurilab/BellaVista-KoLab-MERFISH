@@ -14,7 +14,7 @@ from qtpy import QtWidgets
 
 from . import input_data
 from . import widget_utils
-from demo import download_sample_data
+from bellavista.quickstart import download_sample_data
 
 def bellavista(folder: Path, params: Dict, window_title: str):
     viewer = napari.Viewer()
