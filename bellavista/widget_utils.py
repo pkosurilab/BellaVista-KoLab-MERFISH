@@ -54,13 +54,16 @@ def get_txs_info(txs_data):
     if 'Genes' in txs_data.keys():
         genes = [g.decode("utf-8") if isinstance(g, bytes) else g for g in txs_data['Genes']]
         hdf_categories = list(txs_data['Category'])
-        hdf_categories = [cat.lower() for cat in hdf_categories]
-        categories_sorted = []
+        hdf_categories_lower = {cat.lower(): cat for cat in hdf_categories}
 
-        ## category list order: all-transcripts, cm, ec, fb, ic, cm-scrub
-        for cat in ["all transcripts", "CM transcripts", "EC transcripts", "IC transcripts", "FB transcripts", "CM scrub transcripts"]:
-            if cat.lower() in hdf_categories:
-                categories_sorted.append(cat)
+        # preferred order in widget drop down
+        preferred_order = ["all transcripts", "cm transcripts", "ec transcripts", "ic transcripts", "fb transcripts", "cm scrub transcripts"]
+
+        # add preferred first, then any remaining
+        categories_sorted = (
+            [hdf_categories_lower[cat] for cat in preferred_order if cat in hdf_categories_lower] +
+            [cat for cat in hdf_categories if cat.lower() not in preferred_order]
+        )
 
     else:
         return [], []
@@ -69,14 +72,17 @@ def get_txs_info(txs_data):
 def get_seg_info(seg_data):
     
     hdf_categories = list(seg_data.keys())
-    hdf_categories = [cat.lower() for cat in hdf_categories]
-    categories_sorted = []
+    hdf_categories_lower = {cat.lower(): cat for cat in hdf_categories}
 
-    ## category list order: all-boundaries, cm, ec, fb, ic, cm-scrub
-    for cat in ["all boundaries", "CM boundaries", "EC boundaries", "IC boundaries", "FB boundaries", "CM scrub boundaries"]:
-        if cat.lower() in hdf_categories:
-            categories_sorted.append(cat)
-    
+    # preferred order in widget drop down
+    preferred_order = ["all boundaries", "cm boundaries", "ec boundaries", "ic boundaries", "fb boundaries", "cm scrub boundaries"]
+
+    # add preferred first, then any remaining
+    categories_sorted = (
+        [hdf_categories_lower[cat] for cat in preferred_order if cat in hdf_categories_lower] +
+        [cat for cat in hdf_categories if cat.lower() not in preferred_order]
+    )
+
     return categories_sorted
 
 def get_imgs(img_zarr) -> List:
@@ -518,8 +524,6 @@ class BellaVistaWidget(QtWidgets.QWidget):
             layer_color = standardize_color.transform_color(layer_color)
         except:
             layer_color = 'magenta'
-        
-
 
         if layer_name not in self.viewer.layers:
             self.viewer.add_points(

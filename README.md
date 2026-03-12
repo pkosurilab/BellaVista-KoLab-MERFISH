@@ -1,6 +1,7 @@
 # BellaVista - KoLab-MERFISH edition
 
-This development version is curated for visualization of KoLab-MERFISH datasets from the mouse heart.  
+BellaVista is a visualization tool for interactive exploration of imaging-based transcriptomic data. This development version is designed for data already processed through the KoLab-MERFISH pipeline. BellaVista can be used to visualize the 4 key dataset components of each KoLab-MERFISH dataset: (1) WGA & DAPI images, (2) Cell segmentation boundaries, (3) Transcript locations, (4) Cell network connectivity graphs. Note: BellaVista is purely a visualization tool - it does not perform data processing or analysis :)
+
 
 ## Installation
 
@@ -45,17 +46,14 @@ pip install -e BellaVista-KoLab-MERFISH
 
 # Quick Start (with sample data)
 
-After installing the BellaVista package, launch the demo with a sample FOV from the TAC dataset by running the following command:
+After installing the BellaVista package, launch the demo with a sample FOV from the TAC mouse heart with the following command:
 
 ```
 bellavista --demo
 ```
 
 > [!NOTE]
-> It will take a few minutes to download and create the required data files. The terminal will print updates & have progress bars for time consuming steps.
-
-Once successfully loaded, you should see the message `Data Loaded!` in the terminal.
-A napari window should appear displaying the data similar to the image below:
+> It will take a few minutes to download and create the required data files. The terminal will print updates & display progress bars for time consuming steps. The downloaded sample data folder is ~17MB.
 
 ## BellaVista GUI:
 
@@ -115,11 +113,11 @@ The "Locations 🦎" widget can be used to save and move to marked camera coordi
 > [!NOTE]  
 > If the input files for a feature was not provided or an error occurred during data processing, the corresponding widget may not be available. A detailed log file `error_log.log` can be found in the `BellaVista_outputs` subfolder inside the data folder. 
 
-> **That's it for the Quick Start.** The section below describes how to visualize the full-scale datasets. 
+> **That's it for the Quick Start!** The section below describes how to visualize the full-scale datasets. 
 
 # Dropbox data information:
 
-The dataset files for the full Sham and TAC datasets are on Dropbox, and can be accessed via the private link we shared. There are 2 folders, one for each dataset. Here, you can find the files for each of the 4 key dataset components: (1) WGA & DAPI images (2) Cell boundaries (3) Transcripts (4) Cell network connectivity graphs. After downloading the zipped folder from Dropbox, unzip the folder.
+The dataset files for the full Sham and TAC datasets are on Dropbox, and can be accessed via the private link we shared. There are 2 folders, one for each dataset. Here, you can find the files for each of the 4 key data components: (1) WGA & DAPI images, (2) Cell boundaries, (3) Transcripts, (4) Cell network connectivity graphs, along with auxiliary files. After downloading from Dropbox, unzip the folder.
 
 > [!IMPORTANT]  
 > Each dataset contains a large volume of data ~12GB for the Sham, and ~15GB for the TAC dataset. This is because each dataset contains high resolution WGA & DAPI images, tens-of-thousands of cells, and hundreds-of-millions of transcripts. For visualization, these data will be converted to visualization files that will also require approximately the same amount of space as the raw datasets. So please keep this in mind when downloading the data! 
@@ -131,7 +129,7 @@ bellavista /path/to/downloaded/TAC/dataset/folder
 ```
 
 > [!NOTE]
-> It will take a few minutes to download and create the required data files. The terminal will print updates & have progress bars for time consuming steps.
+> It will take a few minutes to download and create the required data files. The terminal will print updates & display progress bars for time consuming steps.
 
 After successfully loading BellaVista, you should see the message `Data Loaded!` in the terminal. A napari window should appear displaying the data similar to the image below (TAC dataset shown here):
 

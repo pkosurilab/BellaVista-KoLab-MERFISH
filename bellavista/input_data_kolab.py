@@ -26,7 +26,7 @@ def create_micron_pixel(data_folder: str, json_file_input_files: Dict):
         return {}
 
     try:
-        print('Calculating micron to pixel transform')
+        # print('Calculating micron to pixel transform')
         with open(os.path.join(data_folder, microscope_parameters), 'r') as f:
             microscope_parameters = load(f)
 
@@ -61,7 +61,7 @@ def create_transcripts(data_folder: str, json_file_input_files: Dict):
     transcript_filenames = json_file_input_files.get('transcript_files')
 
     if transcript_filenames is None:
-        print('No transcript files provided, skipping transcript processing')
+        print('No transcript files provided, skipping transcript processing.')
         return
 
 
@@ -88,18 +88,19 @@ def create_transcripts(data_folder: str, json_file_input_files: Dict):
                 categories = txs_group.create_group("Category")
             else:
                 categories = txs_group["Category"]
+            
+            existing_txs_categories = list(categories.keys())
+            file_names = [Path(Path(file).stem).stem.replace("_", " ") for file in transcript_filenames]
+            previously_processed = list(set(existing_txs_categories).intersection(set(file_names)))
+            if len(previously_processed) > 0:
+                print(f"{', '.join(previously_processed)} processed previously. Skipping reprocessing.")
 
             for file in transcript_filenames:
                 try:
                     txs_category = Path(Path(file).stem).stem
                     txs_category = txs_category.replace("_", " ")
-
-                    # skip if this category already exists
-                    if txs_category in categories:
-                        print(f"Skipping {txs_category}, already exists in HDF5.")
-                        continue
                     
-                    else:
+                    if not txs_category in categories:
                         if(str(file).endswith(".csv")): 
                             txs = pd.read_csv(data_folder / file)
                         elif(str(file).endswith(".csv.gz")): 
@@ -163,7 +164,7 @@ def process_segmentations(data_folder: str, json_file_input_files: Dict):
     segmentation_filenames = json_file_input_files.get('segmentation_files')
 
     if segmentation_filenames is None:
-        print('No segmentation files provided, skipping segmentation processing')
+        print('No segmentation files provided, skipping segmentation processing.')
         return
     try:
         if isinstance(segmentation_filenames, str):
@@ -174,46 +175,49 @@ def process_segmentations(data_folder: str, json_file_input_files: Dict):
             seg_group = f.require_group("Segmentations")
             categories = seg_group.require_group("Category")
 
+            existing_seg_categories = list(categories.keys())
+            file_names = [Path(Path(file).stem).stem.replace("_", " ") for file in segmentation_filenames]
+            previously_processed = list(set(existing_seg_categories).intersection(set(file_names)))
+            if len(previously_processed) > 0:
+                print(f"{', '.join(previously_processed)} processed previously. Skipping reprocessing.")
+
             for file in segmentation_filenames:
                 
                 try:
-                    seg_file = data_folder / file
-                    seg_category = Path(Path(seg_file).stem).stem
+                    seg_category = Path(Path(file).stem).stem
                     seg_category = seg_category.replace("_", " ")
 
-                    if seg_category in categories:
-                        print(f"Skipping {seg_category}, already exists in HDF5.")
-                        continue
+                    if not seg_category in categories:
                     
-                    if(str(seg_file).endswith(".parquet")): 
-                        cell_df = pd.read_parquet(seg_file)
-                    elif(str(seg_file).endswith(".csv")): 
-                        cell_df = pd.read_csv(seg_file)
-                    elif(str(seg_file).endswith(".csv.gz")): 
-                        cell_df = pd.read_csv(seg_file)
-                    else:
-                        print(f'Invalid file type: {file}, skipping this file')
-                        continue
-                    
-                    counter = 0
-                    
-                    all_seg_bounds = []
-                    
-                    for ind, row in tqdm(cell_df.iterrows(), desc=f'Processing {file}', total=len(cell_df)):
+                        if(str(file).endswith(".parquet")): 
+                            cell_df = pd.read_parquet(data_folder / file)
+                        elif(str(file).endswith(".csv")): 
+                            cell_df = pd.read_csv(data_folder / file)
+                        elif(str(file).endswith(".csv.gz")): 
+                            cell_df = pd.read_csv(data_folder / file)
+                        else:
+                            print(f'Invalid file type: {file}, skipping this file')
+                            continue
                         
-                        # convert hex->binary->Shapely geometry object, extract boundary coordinates of geometry
-                        geom = shapely.from_wkb(bytes.fromhex(row['geometry']))
-                        polys = [geom] if geom.geom_type == 'Polygon' else geom.geoms
+                        counter = 0
+                        
+                        all_seg_bounds = []
+                        
+                        for ind, row in tqdm(cell_df.iterrows(), desc=f'Processing {file}', total=len(cell_df)):
+                            
+                            # convert hex->binary->Shapely geometry object, extract boundary coordinates of geometry
+                            geom = shapely.from_wkb(bytes.fromhex(row['geometry']))
+                            polys = [geom] if geom.geom_type == 'Polygon' else geom.geoms
 
-                        for poly in polys:
-                            coords = np.asarray(poly.exterior.coords)[:, ::-1] # flip to match napari y,x axes
-                            # create 4D numpy array storing segmentation coordinates 
-                            zeros_array = np.tile([counter, 0], (coords.shape[0], 1))
-                            all_seg_bounds.append(np.hstack((zeros_array, coords)))
-                            counter += 1
+                            for poly in polys:
+                                coords = np.asarray(poly.exterior.coords)[:, ::-1] # flip to match napari y,x axes
+                                # create 4D numpy array storing segmentation coordinates 
+                                zeros_array = np.tile([counter, 0], (coords.shape[0], 1))
+                                all_seg_bounds.append(np.hstack((zeros_array, coords)))
+                                counter += 1
 
-                    data = np.vstack(all_seg_bounds)
-                    categories.create_dataset(seg_category, data=data)
+                        data = np.vstack(all_seg_bounds)
+                        categories.create_dataset(seg_category, data=data)
 
                 except Exception as e: 
                     # Log the exception with traceback
@@ -235,7 +239,11 @@ def process_network_graph_celltype(data_folder: str, json_file_input_files: Dict
     
     bellavista_output_folder = data_folder / "BellaVista_outputs"
     network_graph_file = json_file_input_files.get('network_file')
-
+    
+    if network_graph_file is None:
+        print('No network graph file provided, skipping network processing.')
+        return
+    
     try:
         with open(os.path.join(data_folder, network_graph_file), 'rb') as f:
             network_graph_data = pickle.load(f)
@@ -249,7 +257,7 @@ def process_network_graph_celltype(data_folder: str, json_file_input_files: Dict
         categories = network_group.require_group("networks")
 
         if 'connectome' in categories:
-            print(f"Skipping graph processing, already exists in HDF5.")
+            print(f"Cell network graph processed previously. Skipping reprocessing.")
             return
         
         celltype_centroids = defaultdict(list)
@@ -260,7 +268,7 @@ def process_network_graph_celltype(data_folder: str, json_file_input_files: Dict
             G = network_graph_data
 
             ## get cell centroids from network graph pickle
-            for node in tqdm(G.nodes, desc=f'Processing network graph nodes', total=len(G.nodes)):
+            for node in tqdm(G.nodes, desc=f'Processing cell network graph nodes', total=len(G.nodes)):
                 celltype_centroids[G.nodes[node]['celltype']].append(np.flip(G.nodes[node]['pos']))
                 celltype_node_ids[G.nodes[node]['celltype']].append(node)
             
