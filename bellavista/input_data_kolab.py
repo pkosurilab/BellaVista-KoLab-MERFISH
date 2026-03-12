@@ -1,7 +1,6 @@
 #Author: Annabelle Coles
 #Version: KoLab-MERFISH Mouse Heart Paper
 
-import ast
 import logging
 import os
 import pickle
@@ -91,39 +90,53 @@ def create_transcripts(data_folder: str, json_file_input_files: Dict):
                 categories = txs_group["Category"]
 
             for file in transcript_filenames:
-                
-                txs_category = Path(Path(file).stem).stem
-                txs_category = txs_category.replace("_", " ")
+                try:
+                    txs_category = Path(Path(file).stem).stem
+                    txs_category = txs_category.replace("_", " ")
 
-                # skip if this category already exists
-                if txs_category in categories:
-                    print(f"Skipping {txs_category}, already exists in HDF5.")
-                    continue
-                
-                else:
-                    if(str(file).endswith(".csv")): 
-                        txs = pd.read_csv(data_folder / file)
-                    elif(str(file).endswith(".csv.gz")): 
-                        txs = pd.read_csv(data_folder / file)
-                    elif(str(file).endswith(".parquet")): 
-                        txs = pd.read_parquet(data_folder / file)
-                    
-                    else:
-                        print(f'Invalid file type: {file}, skipping this file')
+                    # skip if this category already exists
+                    if txs_category in categories:
+                        print(f"Skipping {txs_category}, already exists in HDF5.")
                         continue
                     
-                    all_genes.update(txs["gene"].astype(str))
+                    else:
+                        if(str(file).endswith(".csv")): 
+                            txs = pd.read_csv(data_folder / file)
+                        elif(str(file).endswith(".csv.gz")): 
+                            txs = pd.read_csv(data_folder / file)
+                        elif(str(file).endswith(".parquet")): 
+                            txs = pd.read_parquet(data_folder / file)
+                        
+                        else:
+                            print(f'Invalid file type: {file}, skipping this file')
+                            continue
+                        
+                        all_genes.update(txs["gene"].astype(str))
+                        
+                        barcodes = categories.create_group(txs_category)
+                        for gene, group in tqdm(txs.groupby('gene'), total=txs['gene'].nunique(), desc=f"Processing {file}"):
+                            coords = group[['global_y', 'global_x']].values
+                            barcodes.create_dataset(str(gene), data=coords)
                     
-                    barcodes = categories.create_group(txs_category)
-                    for gene, group in tqdm(txs.groupby('gene'), total=txs['gene'].nunique(), desc=f"Processing {file}"):
-                        coords = group[['global_y', 'global_x']].values
-                        barcodes.create_dataset(str(gene), data=coords)
-
+                except Exception as e: 
+                    # Log the exception with traceback
+                    print(f'An error occurred while processing {file}')
+                    print(f'Please check the log file for details: {os.path.join(bellavista_output_folder, "error_log.log")}', end='\n\n')
+                    logging.error(f'Error in create_transcripts while processing {file}: {e}', exc_info=True)
+                    continue
             
             # update gene list
             if "Genes" in txs_group:
                 del txs_group["Genes"]  # replace old dataset
             txs_group.create_dataset("Genes", data=list(sorted(all_genes)))
+
+            # set empty gene coord lists to absent genes in a transcript categories
+            for txs_category in categories:
+                genes_in_ds = list(categories[txs_category].keys())
+                genes_missing = set(all_genes).difference(set(genes_in_ds))
+
+                for gene in genes_missing:
+                    categories[txs_category].create_dataset(str(gene), data=[])
 
     except Exception as e: 
         # Log the exception with traceback
@@ -162,43 +175,52 @@ def process_segmentations(data_folder: str, json_file_input_files: Dict):
             categories = seg_group.require_group("Category")
 
             for file in segmentation_filenames:
-                seg_file = data_folder / file
-                seg_category = Path(Path(seg_file).stem).stem
-                seg_category = seg_category.replace("_", " ")
+                
+                try:
+                    seg_file = data_folder / file
+                    seg_category = Path(Path(seg_file).stem).stem
+                    seg_category = seg_category.replace("_", " ")
 
-                if seg_category in categories:
-                    print(f"Skipping {seg_category}, already exists in HDF5.")
-                    continue
-                
-                if(str(seg_file).endswith(".parquet")): 
-                    cell_df = pd.read_parquet(seg_file)
-                elif(str(seg_file).endswith(".csv")): 
-                    cell_df = pd.read_csv(seg_file)
-                elif(str(seg_file).endswith(".csv.gz")): 
-                    cell_df = pd.read_csv(seg_file)
-                else:
-                    print(f'Invalid file type: {file}, skipping this file')
-                    continue
-                
-                counter = 0
-                
-                all_seg_bounds = []
-                
-                for ind, row in tqdm(cell_df.iterrows(), desc=f'Processing {file}', total=len(cell_df)):
+                    if seg_category in categories:
+                        print(f"Skipping {seg_category}, already exists in HDF5.")
+                        continue
                     
-                    # convert hex->binary->Shapely geometry object, extract boundary coordinates of geometry
-                    geom = shapely.from_wkb(bytes.fromhex(row['geometry']))
-                    polys = [geom] if geom.geom_type == 'Polygon' else geom.geoms
+                    if(str(seg_file).endswith(".parquet")): 
+                        cell_df = pd.read_parquet(seg_file)
+                    elif(str(seg_file).endswith(".csv")): 
+                        cell_df = pd.read_csv(seg_file)
+                    elif(str(seg_file).endswith(".csv.gz")): 
+                        cell_df = pd.read_csv(seg_file)
+                    else:
+                        print(f'Invalid file type: {file}, skipping this file')
+                        continue
+                    
+                    counter = 0
+                    
+                    all_seg_bounds = []
+                    
+                    for ind, row in tqdm(cell_df.iterrows(), desc=f'Processing {file}', total=len(cell_df)):
+                        
+                        # convert hex->binary->Shapely geometry object, extract boundary coordinates of geometry
+                        geom = shapely.from_wkb(bytes.fromhex(row['geometry']))
+                        polys = [geom] if geom.geom_type == 'Polygon' else geom.geoms
 
-                    for poly in polys:
-                        coords = np.asarray(poly.exterior.coords)[:, ::-1] # flip to match napari y,x axes
-                        # create 4D numpy array storing segmentation coordinates 
-                        zeros_array = np.tile([counter, 0], (coords.shape[0], 1))
-                        all_seg_bounds.append(np.hstack((zeros_array, coords)))
-                        counter += 1
+                        for poly in polys:
+                            coords = np.asarray(poly.exterior.coords)[:, ::-1] # flip to match napari y,x axes
+                            # create 4D numpy array storing segmentation coordinates 
+                            zeros_array = np.tile([counter, 0], (coords.shape[0], 1))
+                            all_seg_bounds.append(np.hstack((zeros_array, coords)))
+                            counter += 1
 
-                data = np.vstack(all_seg_bounds)
-                categories.create_dataset(seg_category, data=data)
+                    data = np.vstack(all_seg_bounds)
+                    categories.create_dataset(seg_category, data=data)
+
+                except Exception as e: 
+                    # Log the exception with traceback
+                    print(f'An error occurred while processing {file}')
+                    print(f'Please check the log file for details: {os.path.join(bellavista_output_folder, "error_log.log")}', end='\n\n')
+                    logging.error(f'Error in create_transcripts while processing {file}: {e}', exc_info=True)
+                    continue
 
     except Exception as e: 
         # Log the exception with traceback

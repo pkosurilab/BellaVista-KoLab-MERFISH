@@ -102,6 +102,7 @@ class BellaVistaWidget(QtWidgets.QWidget):
         self.img_zarr = img_zarr
         self.rotate_angle = params.get('rotate_angle', 0)
         self.contrast_lims = params.get('contrast_limits')
+        self.gamma = params.get('gamma', 1)
         self.point_size = params.get('transcript_point_size', 1)
         set_celltype_colors(self)
 
@@ -120,8 +121,9 @@ class BellaVistaWidget(QtWidgets.QWidget):
             ## only make widget if there is data inside hdf5 
             if len(self.txs_data) > 0:
                 self.genes, self.genes_categories = get_txs_info(self.txs_data)
-                self.gene_widget = self._create_txs_widget()
-                widget_list.append(self.gene_widget)
+                if len(self.genes_categories) > 0:
+                    self.gene_widget = self._create_txs_widget()
+                    widget_list.append(self.gene_widget)
             
         if seg_data: 
             self.seg_data = seg_data['Segmentations']['Category']
@@ -495,6 +497,7 @@ class BellaVistaWidget(QtWidgets.QWidget):
                         translate=(0, rotated_yshift, rotated_xshift), 
                         rotate=self.rotate_angle,
                         contrast_limits=self.contrast_lims,
+                        gamma=self.gamma,
                         colormap = 'gray')
         
     def _plot(self):
@@ -516,6 +519,8 @@ class BellaVistaWidget(QtWidgets.QWidget):
         except:
             layer_color = 'magenta'
         
+
+
         if layer_name not in self.viewer.layers:
             self.viewer.add_points(
                 self.txs_data['Category'][gene_group][gene], 
