@@ -46,7 +46,7 @@ def bellavista(folder: Path, params: Dict, window_title: str):
 def run_demo():
     print("Running Quick Start Demo!")
     # download sample data from dropbox
-    download_sample_data.main()
+    download_sample_data.run_quickstart_demo()
     
     save_folder = os.getcwd()
     folder_name = "KoLab_MERFISH_TAC_single_FOV"
@@ -91,17 +91,28 @@ def main():
     
     parser.add_argument('-i', '--input-file', type=str, help='Path to dataset JSON config file. Use "demo" to run the sample demo dataset')
     parser.add_argument('--demo', action='store_true', help='Visualize the sample demo dataset')
+    parser.add_argument('--dataset-url', type=str, help='Visualize dataset given online url')
 
     args = parser.parse_args()
     
     # If no input provided, run demo by default
     if len(sys.argv) == 1:
         args.demo = True
-
+    
     # "Quick Start" demo with a sample FOV from the TAC dataset
     if args.demo:
         json_file, input_file = run_demo()
 
+    elif args.dataset_url:
+        dataset_url = args.dataset_url
+        input_path = download_sample_data.run_full_dataset(dataset_url)
+        input_file = glob.glob(os.path.join(input_path, "*config*.json"))[0]
+        
+        with open(input_file, 'r') as f:
+            json_file = load(f)
+        
+        json_file["data_folder"] = input_path
+        
     elif args.input_file or args.positional_input_file:
         input_path = args.input_file or args.positional_input_file
 
