@@ -5,7 +5,7 @@ BellaVista is a visualization tool for interactive exploration of imaging-based 
 
 ## Quick Start
 
-1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/). 
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and [git](https://git-scm.com/install/windows) (if not previously installed)
 2. Launch the BellaVista demo in a terminal with the single-line command:
 
 ```
