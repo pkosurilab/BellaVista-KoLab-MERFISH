@@ -411,11 +411,16 @@ class BellaVistaWidget(QtWidgets.QWidget):
                 )
         
         node_data = self.network_data['connectome']['nodes']
+        
+
         for celltype in ["IC", "FB", "EC", "CM"]:
             coords = node_data[f'{celltype}_centroids'][:]
+            nodeids = [g.decode("utf-8") if isinstance(g, bytes) else g for g in node_data[f'{celltype}_node_ids']]
+
             self.viewer.add_points(
                 coords,
                 name=f'{celltype} nodes', 
+                properties={'CellID: ': nodeids},
                 face_color=self.celltype_colors[celltype], 
                 border_color=self.celltype_colors[celltype], 
                 size=self.node_size,
