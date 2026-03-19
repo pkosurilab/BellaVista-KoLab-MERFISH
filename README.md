@@ -5,11 +5,14 @@ BellaVista is a visualization tool for interactive exploration of imaging-based 
 
 ## Quick Start
 
-1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and [git](https://git-scm.com/install/windows) (if not previously installed)
-2. Launch the BellaVista demo in a terminal with the single-line command:
+1. Install [Python](https://www.python.org/downloads/) (if not previously installed)
+2. Install [git](https://git-scm.com/install/windows) (if not previously installed)
+3. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 
+
+Launch the BellaVista demo in a terminal with the single-line command:
 
 ```
-uvx --from git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH bellavista
+uvx -p 3.12 --from git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH bellavista
 ```
 
 > [!NOTE]
@@ -112,7 +115,7 @@ The boundaries for each cell type will be colored as follows: CM: pink, EC: gree
 We will share the commands to visualize the Sham and TAC datasets, including the private url-links. To visualize a dataset hosted on the web, use the following single-line command:
 
 ```
-uvx --from git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH bellavista --dataset-url "url-link-to-dataset"
+uvx -p 3.12 --from git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH bellavista --dataset-url "url-link-to-dataset"
 ```
 
 > [!NOTE]
@@ -146,7 +149,7 @@ Try zooming in & out, plotting cell-type-specific transcripts, cell boundaries, 
 For a full installation, we recommend using [Anaconda](https://www.anaconda.com/).
 - In MacOS, run the following commands from the Terminal.
 - In Windows, run the following commands from the Anaconda Prompt.
-- BellaVista requires Python 3.10 or above and is dependent on GPU for rendering. 
+- BellaVista requires Python 3.10 or above and is dependent on GPU for rendering. We recommend Python 3.12.
 
 ### Using conda/pip
 
