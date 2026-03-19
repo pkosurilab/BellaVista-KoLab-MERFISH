@@ -609,7 +609,7 @@ class BellaVistaWidget(QtWidgets.QWidget):
                 colormap = cmap, 
                 blending = 'opaque', 
                 rotate=self.rotate_angle,
-                tail_width=0.5
+                tail_width=1
                 )
         else:
             self.viewer.layers[layer_name].visible=True
