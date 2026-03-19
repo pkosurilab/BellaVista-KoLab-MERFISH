@@ -113,12 +113,13 @@ class BellaVistaWidget(QtWidgets.QWidget):
         set_celltype_colors(self)
 
         widget_list = []
-
+        
+        # remove image widget (for demo purposes)
         if img_zarr:
             self.imgs = get_imgs(self.img_zarr)
-            if len(self.imgs) > 0:
-                self.image_widget = self._create_image_widget()
-                widget_list.append(self.image_widget)
+        #     if len(self.imgs) > 0:
+        #         self.image_widget = self._create_image_widget()
+        #         widget_list.append(self.image_widget)
 
 
         if txs_data:
@@ -400,33 +401,45 @@ class BellaVistaWidget(QtWidgets.QWidget):
         
         ## only plot outgoing edges from CM nodes
         ## network edges colored by neighbor node celltype 
+        
         for celltype in ["IC", "FB", "EC", "CM"]:
-            self.viewer.add_vectors(
-                self.network_data['connectome']['graph_edges'][celltype][:], 
-                name=f'{celltype} Network Edges', 
-                edge_color= self.celltype_colors[celltype], 
-                opacity=1, 
-                vector_style='line', 
-                rotate=self.rotate_angle
-                )
+            layer_name = f'{celltype} Network Edges'
+            if layer_name not in self.viewer.layers:
+
+                self.viewer.add_vectors(
+                    self.network_data['connectome']['graph_edges'][celltype][:], 
+                    name=layer_name, 
+                    edge_color= self.celltype_colors[celltype], 
+                    opacity=1, 
+                    vector_style='line', 
+                    rotate=self.rotate_angle
+                    )
+            else:
+                self.viewer.layers[layer_name].visible=True
         
         node_data = self.network_data['connectome']['nodes']
         
 
         for celltype in ["IC", "FB", "EC", "CM"]:
-            coords = node_data[f'{celltype}_centroids'][:]
-            nodeids = [g.decode("utf-8") if isinstance(g, bytes) else g for g in node_data[f'{celltype}_node_ids']]
+            
+            layer_name = f'{celltype} nodes'
 
-            self.viewer.add_points(
-                coords,
-                name=f'{celltype} nodes', 
-                properties={'CellID: ': nodeids},
-                face_color=self.celltype_colors[celltype], 
-                border_color=self.celltype_colors[celltype], 
-                size=self.node_size,
-                rotate=self.rotate_angle
-                )
-            self.node_layers.append(f'{celltype} nodes')
+            if layer_name not in self.viewer.layers:
+                coords = node_data[f'{celltype}_centroids'][:]
+                nodeids = [g.decode("utf-8") if isinstance(g, bytes) else g for g in node_data[f'{celltype}_node_ids']]
+
+                self.viewer.add_points(
+                    coords,
+                    name=layer_name, 
+                    properties={'CellID: ': nodeids},
+                    face_color=self.celltype_colors[celltype], 
+                    border_color=self.celltype_colors[celltype], 
+                    size=self.node_size,
+                    rotate=self.rotate_angle
+                    )
+                self.node_layers.append(layer_name)
+            else:
+                self.viewer.layers[layer_name].visible=True
 
     def set_node_sizes(self):
         
@@ -470,46 +483,51 @@ class BellaVistaWidget(QtWidgets.QWidget):
         
     def _pre_load_image(self):
         
-        ## default plot WGA image, if not plot other images in list e.g. DAPI
-        img_name = next((name for name in self.imgs if "WGA" in name), None)
+        # ## default plot WGA image, if not plot other images in list e.g. DAPI
+        # img_name = next((name for name in self.imgs if "WGA" in name), None)
         
-        if img_name is None:
-            img_name = self.img_dropdown.currentText()
+        # if img_name is None:
+        #     img_name = self.img_dropdown.currentText()
 
-        if img_name is None:
-            return 
-        
-        path = self.img_zarr / img_name
+        # if img_name is None:
+        #     return 
 
-        store = parse_url(path, mode="r").store
-        root = zarr.group(store=store)
-        image_meta = root.attrs.get('multiscales', [{}])[0].get('metadata', {})
+        img_colormaps = {"WGA": "gray", "DAPI": "blue"}
 
-        um_per_pixel_y, um_per_pixel_x = (
-            image_meta.get('um_per_pixel_y', 1), 
-            image_meta.get('um_per_pixel_x', 1)
-        )
-        y_shift, x_shift = image_meta.get('y_shift',0), image_meta.get('x_shift',0)
+        for img_name in ["WGA", "DAPI"]:
 
-        rotated = rotate(self.rotate_angle) @ np.array([y_shift, x_shift])
+            if img_name in self.imgs:
+                path = self.img_zarr / img_name
 
-        rotated_yshift = rotated[0]
-        rotated_xshift = rotated[1]
+                store = parse_url(path, mode="r").store
+                root = zarr.group(store=store)
+                image_meta = root.attrs.get('multiscales', [{}])[0].get('metadata', {})
 
-        if not self.contrast_lims:
-            self.contrast_lims = [image_meta.get('px_val_min',0), 
-                                image_meta.get('px_val_max', 65535)]
+                um_per_pixel_y, um_per_pixel_x = (
+                    image_meta.get('um_per_pixel_y', 1), 
+                    image_meta.get('um_per_pixel_x', 1)
+                )
+                y_shift, x_shift = image_meta.get('y_shift',0), image_meta.get('x_shift',0)
+
+                rotated = rotate(self.rotate_angle) @ np.array([y_shift, x_shift])
+
+                rotated_yshift = rotated[0]
+                rotated_xshift = rotated[1]
+
+                if not self.contrast_lims:
+                    self.contrast_lims = [image_meta.get('px_val_min',0), 
+                                        image_meta.get('px_val_max', 65535)]
             
-        self.viewer.open(path,
-                        name=img_name, 
-                        plugin='napari-ome-zarr',
-                        blending='additive', 
-                        scale=(1, um_per_pixel_y, um_per_pixel_x),
-                        translate=(0, rotated_yshift, rotated_xshift), 
-                        rotate=self.rotate_angle,
-                        contrast_limits=self.contrast_lims,
-                        gamma=self.gamma,
-                        colormap = 'gray')
+                self.viewer.open(path,
+                                name=img_name, 
+                                plugin='napari-ome-zarr',
+                                blending='additive', 
+                                scale=(1, um_per_pixel_y, um_per_pixel_x),
+                                translate=(0, rotated_yshift, rotated_xshift), 
+                                rotate=self.rotate_angle,
+                                contrast_limits=self.contrast_lims,
+                                gamma=self.gamma,
+                                colormap = img_colormaps[img_name])
         
     def _plot(self):
         gene = self.gene_dropdown.currentText()
@@ -591,7 +609,7 @@ class BellaVistaWidget(QtWidgets.QWidget):
                 colormap = cmap, 
                 blending = 'opaque', 
                 rotate=self.rotate_angle,
-                tail_width=0.5
+                tail_width=1
                 )
         else:
             self.viewer.layers[layer_name].visible=True

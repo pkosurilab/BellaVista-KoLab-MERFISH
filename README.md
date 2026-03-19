@@ -5,11 +5,14 @@ BellaVista is a visualization tool for interactive exploration of imaging-based 
 
 ## Quick Start
 
-1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and [git](https://git-scm.com/install/windows) (if not previously installed)
-2. Launch the BellaVista demo in a terminal with the single-line command:
+1. Install [Python](https://www.python.org/downloads/) (if not previously installed)
+2. Install [git](https://git-scm.com/install/windows) (if not previously installed)
+3. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 
+
+Launch the BellaVista demo in a terminal with the single-line command:
 
 ```
-uvx --from git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH bellavista
+uvx -p 3.12 --from git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH bellavista
 ```
 
 > [!NOTE]
@@ -30,10 +33,10 @@ Try zooming in & out, plotting cell-type-specific transcripts, cell boundaries, 
 
 ## BellaVista Widget Menu
 
-BellaVista uses the napari interface and features a widget located on the right side of the napari window to plot each dataset feature. The widget has five components:
+BellaVista uses the napari interface and features a widget located on the right side of the napari window to plot each dataset feature. The widget has four components:
 
 
-
+<!-- 
 <p align="left">
   
   <h3 align="left">Image Widget</h3>
@@ -41,7 +44,7 @@ BellaVista uses the napari interface and features a widget located on the right 
   alt="BellaVista image widget" width="200" />
 
   The image widget features a dropdown menu with the images that are available to plot. The demo dataset contains WGA and DAPI images. 
-</p>
+</p> -->
 
 
 <p align="left">
@@ -112,7 +115,7 @@ The boundaries for each cell type will be colored as follows: CM: pink, EC: gree
 We will share the commands to visualize the Sham and TAC datasets, including the private url-links. To visualize a dataset hosted on the web, use the following single-line command:
 
 ```
-uvx --from git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH bellavista --dataset-url "url-link-to-dataset"
+uvx -p 3.12 --from git+https://github.com/pkosurilab/BellaVista-KoLab-MERFISH bellavista --dataset-url "url-link-to-dataset"
 ```
 
 > [!NOTE]
@@ -133,7 +136,7 @@ Try zooming in & out, plotting cell-type-specific transcripts, cell boundaries, 
 </p>
 
 > [!IMPORTANT]  
-> Each dataset contains a volume of data ~3GB for the Sham, and ~4GB for the TAC dataset. This is because each dataset contains WGA & DAPI images, tens-of-thousands of cells, and hundreds-of-millions of transcripts. For visualization, these data will be converted to visualization files that will also require approximately the same amount of space as the raw datasets. So please keep this in mind when downloading the data!
+> Each dataset contains a volume of data ~2GB for the Sham, and ~2.5GB for the TAC dataset. Each dataset contains WGA & DAPI images, tens-of-thousands of cells, and hundreds-of-millions of transcripts. For visualization, these data will be converted to visualization files that will also require approximately the same amount of space as the raw datasets. So please keep this in mind when downloading the data!
 >
 > Each folder contains 4 key data components: (1) WGA & DAPI images, (2) Cell boundaries, (3) Transcripts, (4) Cell network connectivity graphs, along with auxiliary files. 
 
@@ -146,7 +149,7 @@ Try zooming in & out, plotting cell-type-specific transcripts, cell boundaries, 
 For a full installation, we recommend using [Anaconda](https://www.anaconda.com/).
 - In MacOS, run the following commands from the Terminal.
 - In Windows, run the following commands from the Anaconda Prompt.
-- BellaVista requires Python 3.10 or above and is dependent on GPU for rendering. 
+- BellaVista requires Python 3.10 or above and is dependent on GPU for rendering. We recommend Python 3.12.
 
 ### Using conda/pip
 
