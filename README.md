@@ -33,10 +33,10 @@ Try zooming in & out, plotting cell-type-specific transcripts, cell boundaries, 
 
 ## BellaVista Widget Menu
 
-BellaVista uses the napari interface and features a widget located on the right side of the napari window to plot each dataset feature. The widget has five components:
+BellaVista uses the napari interface and features a widget located on the right side of the napari window to plot each dataset feature. The widget has four components:
 
 
-
+<!-- 
 <p align="left">
   
   <h3 align="left">Image Widget</h3>
@@ -44,7 +44,7 @@ BellaVista uses the napari interface and features a widget located on the right 
   alt="BellaVista image widget" width="200" />
 
   The image widget features a dropdown menu with the images that are available to plot. The demo dataset contains WGA and DAPI images. 
-</p>
+</p> -->
 
 
 <p align="left">
