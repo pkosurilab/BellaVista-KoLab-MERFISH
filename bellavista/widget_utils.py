@@ -401,33 +401,45 @@ class BellaVistaWidget(QtWidgets.QWidget):
         
         ## only plot outgoing edges from CM nodes
         ## network edges colored by neighbor node celltype 
+        
         for celltype in ["IC", "FB", "EC", "CM"]:
-            self.viewer.add_vectors(
-                self.network_data['connectome']['graph_edges'][celltype][:], 
-                name=f'{celltype} Network Edges', 
-                edge_color= self.celltype_colors[celltype], 
-                opacity=1, 
-                vector_style='line', 
-                rotate=self.rotate_angle
-                )
+            layer_name = f'{celltype} Network Edges'
+            if layer_name not in self.viewer.layers:
+
+                self.viewer.add_vectors(
+                    self.network_data['connectome']['graph_edges'][celltype][:], 
+                    name=layer_name, 
+                    edge_color= self.celltype_colors[celltype], 
+                    opacity=1, 
+                    vector_style='line', 
+                    rotate=self.rotate_angle
+                    )
+            else:
+                self.viewer.layers[layer_name].visible=True
         
         node_data = self.network_data['connectome']['nodes']
         
 
         for celltype in ["IC", "FB", "EC", "CM"]:
-            coords = node_data[f'{celltype}_centroids'][:]
-            nodeids = [g.decode("utf-8") if isinstance(g, bytes) else g for g in node_data[f'{celltype}_node_ids']]
+            
+            layer_name = f'{celltype} nodes'
 
-            self.viewer.add_points(
-                coords,
-                name=f'{celltype} nodes', 
-                properties={'CellID: ': nodeids},
-                face_color=self.celltype_colors[celltype], 
-                border_color=self.celltype_colors[celltype], 
-                size=self.node_size,
-                rotate=self.rotate_angle
-                )
-            self.node_layers.append(f'{celltype} nodes')
+            if layer_name not in self.viewer.layers:
+                coords = node_data[f'{celltype}_centroids'][:]
+                nodeids = [g.decode("utf-8") if isinstance(g, bytes) else g for g in node_data[f'{celltype}_node_ids']]
+
+                self.viewer.add_points(
+                    coords,
+                    name=layer_name, 
+                    properties={'CellID: ': nodeids},
+                    face_color=self.celltype_colors[celltype], 
+                    border_color=self.celltype_colors[celltype], 
+                    size=self.node_size,
+                    rotate=self.rotate_angle
+                    )
+                self.node_layers.append(layer_name)
+            else:
+                self.viewer.layers[layer_name].visible=True
 
     def set_node_sizes(self):
         
