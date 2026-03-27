@@ -492,7 +492,7 @@ class BellaVistaWidget(QtWidgets.QWidget):
         # if img_name is None:
         #     return 
 
-        img_colormaps = {"WGA": "gray", "DAPI": "blue"}
+        img_colormaps = {"WGA": "gray", "DAPI": "bop blue"}
 
         for img_name in ["WGA", "DAPI"]:
 
