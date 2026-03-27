@@ -57,7 +57,7 @@ def get_txs_info(txs_data):
         hdf_categories_lower = {cat.lower(): cat for cat in hdf_categories}
 
         # preferred order in widget drop down
-        preferred_order = ["all transcripts", "cm transcripts", "ec transcripts", "ic transcripts", "fb transcripts", "cm scrub transcripts"]
+        preferred_order = ["all transcripts", "cm transcripts", "ec transcripts", "ic transcripts", "fb transcripts"]
 
         # add preferred first, then any remaining
         categories_sorted = (
@@ -75,7 +75,7 @@ def get_seg_info(seg_data):
     hdf_categories_lower = {cat.lower(): cat for cat in hdf_categories}
 
     # preferred order in widget drop down
-    preferred_order = ["all boundaries", "cm boundaries", "ec boundaries", "ic boundaries", "fb boundaries", "cm scrub boundaries"]
+    preferred_order = ["all boundaries", "cm boundaries", "ec boundaries", "ic boundaries", "fb boundaries"]
 
     # add preferred first, then any remaining
     categories_sorted = (
@@ -492,7 +492,7 @@ class BellaVistaWidget(QtWidgets.QWidget):
         # if img_name is None:
         #     return 
 
-        img_colormaps = {"WGA": "gray", "DAPI": "blue"}
+        img_colormaps = {"WGA": "gray", "DAPI": "bop blue"}
 
         for img_name in ["WGA", "DAPI"]:
 
