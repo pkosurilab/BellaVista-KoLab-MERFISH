@@ -91,7 +91,7 @@ The boundaries for each cell type will be colored as follows: CM: pink, EC: gree
   <img src="https://github.com/pkosurilab/BellaVista-KoLab-MERFISH/blob/main/images/network_widget.png?raw=true"
   alt="BellaVista network widget" width="200" />
 
-  The network widget can be used to plot the cell connectivity networks. The centroid of each cell is plotted as a node (napari point layer), and is colored by its corresponding cell type: CM: pink, EC: green, IC: blue, FB: yellow. Cardiomyocyte->cell-type-specific edges are plotted, and are colored by the cell-type identity of the corresponding cardiomyocyte's neighbor. The node size can be adjusted with this widget.  
+  The network widget can be used to plot the cell connectivity networks. The centroid of each cell is plotted as a node (napari point layer), and is colored by its corresponding cell type: CM: pink, EC: green, IC: blue, FB: yellow. Cardiomyocyte->cell-type-specific edges are plotted, and are colored by the cell-type identity of the corresponding cardiomyocyte's neighbor. Note: this network is cardiomyocyte centric, meaning if two cells are connected, but neither is a cardiomyocyte, then the connection will not be shown. The node size can be adjusted with this widget.  
   </p>
 
 <p align="left">
