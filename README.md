@@ -23,6 +23,8 @@ Restart the shell (close and reopen the terminal) to complete the installation.
 uvx -p 3.12 bellavista
 ```
 
+<br>
+
 > **Linux note**: If you see the error: `Could not load the Qt platform plugin "xcb" in "" even though it was found.` Install the required system libraries: `sudo apt install libxcb-cursor0 libxkbcommon-x11-0 libxcb-xinerama0`. Then re-run step 2!
 
 <br>
