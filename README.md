@@ -1,11 +1,14 @@
-# BellaVista - KoLab-MERFISH edition
+# BellaVista
 
-BellaVista is a visualization tool for interactive exploration of imaging-based transcriptomic data. This BellaVista release is designed for data already processed through the KoLab-MERFISH pipeline. BellaVista can be used to visualize the 4 key dataset components of each KoLab-MERFISH dataset: (1) WGA & DAPI images, (2) Cell segmentation boundaries, (3) Transcript locations, (4) Cell network connectivity graphs. Note: BellaVista is purely a visualization tool - it does not perform data processing or analysis :)
-
+BellaVista is a visualization tool utilizing the [napari](https://napari.org/) viewer for interactive exploration of imaging-based transcriptomic data. This BellaVista release is designed for data already processed through the KoLab-MERFISH pipeline. BellaVista can be used to visualize the 4 key dataset components of each KoLab-MERFISH dataset: (1) WGA & DAPI images, (2) Cell segmentation boundaries, (3) Transcript locations, (4) Cell network connectivity graphs. Note: BellaVista is purely a visualization tool - it does not perform data processing or analysis :)
 
 ## Quick Start
 
-1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+This short demo will load a sample FOV from the TAC mouse heart. BellaVista is installed and run via the command line. Run the steps below in the `Terminal` (macOS/Linux) or `PowerShell` (Windows) application. 
+
+> **Note:** BellaVista requires a GPU for rendering. 
+
+### 1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
 ```
 # macOS/Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -13,17 +16,21 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Windows
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
+Restart the shell (close and reopen the terminal) to complete the installation. 
 
-2. Launch the BellaVista demo in a terminal with the single-line command:
-
+### 2. Launch BellaVista 
 ```
 uvx -p 3.12 bellavista
 ```
 
+> **Linux note**: If you see the error: `Could not load the Qt platform plugin "xcb" in "" even though it was found.` Install the required system libraries: `sudo apt install libxcb-cursor0 libxkbcommon-x11-0 libxcb-xinerama0`. Then re-run step 2!
+
+<br>
+
 > [!NOTE]
 > It will take a few minutes to download and create the required data files. The terminal will print updates & display progress bars for time consuming steps. The sample data is a single FOV from the TAC mouse heart and is ~17MB. 
 
-After successfully loading BellaVista, you should see the message Data Loaded! in the terminal. A napari window should appear displaying the sample data similar to the image below (TAC sample FOV dataset shown here):
+After successfully loading BellaVista, you should see the message `Data Loaded!` in the terminal. A napari window should appear displaying the sample data similar to the image below:
 
 <p align="middle">
 <img src="https://raw.githubusercontent.com/pkosurilab/BellaVista-KoLab-MERFISH/main/images/BellaVista_demo_launch_screen.png" alt="BellaVista demo sample TAC dataset initial screen" width="800" />
@@ -111,7 +118,7 @@ The boundaries for each cell type will be colored as follows: CM: pink, EC: gree
 > [!NOTE]  
 > If the input files for a feature was not provided or an error occurred during data processing, the corresponding widget may not be available. A detailed log file `error_log.log` can be found in the `BellaVista_outputs` subfolder inside the data folder. 
 
-## That's it for the Quick Start!
+> **That's it for the quick start!** 
 
 # Visualizing full MERFISH datasets
 
