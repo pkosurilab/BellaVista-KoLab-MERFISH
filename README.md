@@ -23,7 +23,7 @@ uvx -p 3.12 bellavista
 > [!NOTE]
 > It will take a few minutes to download and create the required data files. The terminal will print updates & display progress bars for time consuming steps. The sample data is a single FOV from the TAC mouse heart and is ~17MB. 
 
-After successfully loading the BellaVista, you should see the message Data Loaded! in the terminal. A napari window should appear displaying the sample data similar to the image below (TAC sample FOV dataset shown here):
+After successfully loading BellaVista, you should see the message Data Loaded! in the terminal. A napari window should appear displaying the sample data similar to the image below (TAC sample FOV dataset shown here):
 
 <p align="middle">
 <img src="https://raw.githubusercontent.com/pkosurilab/BellaVista-KoLab-MERFISH/main/images/BellaVista_demo_launch_screen.png" alt="BellaVista demo sample TAC dataset initial screen" width="800" />
