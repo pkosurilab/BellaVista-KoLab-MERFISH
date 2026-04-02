@@ -574,10 +574,11 @@ class BellaVistaWidget(QtWidgets.QWidget):
                     selected_layer.face_color = color
                     selected_layer.border_color = color
 
-                    # Toggle visibility on/off to update the layer menu preview image
-                    selected_layer.visible = False  
-                    selected_layer.visible = True  
-                
+                    ## update the layer menu preview image
+                    selected_layer.current_face_color = transformed
+                    selected_layer.current_border_color = transformed
+                    selected_layer.refresh()
+
                 except (AttributeError, ValueError, KeyError):
                     warnings.warn(
                     trans._(
